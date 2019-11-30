@@ -1,11 +1,11 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <assert.h>
 #include <webp/encode.h>
 #include <webp/decode.h>
 #include <webp/types.h>
 #include <imageio/image_enc.h>
 #include <imageio/image_dec.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
 
 
 void webp_picture_from_jpeg(const uint8_t* data, size_t data_size, WebPPicture* const pic) {
