@@ -18,8 +18,7 @@ pub fn jpeg_to_webp(data: Vec<u8>) -> Result<WebPPicture, String> {
     let mut picture: WebPPicture = unsafe {
         std::mem::zeroed()
     };
-    let format = ::image::guess_format(&data)
-        .map_err(|x| format!("{:?}", x))?;
+    let format = ::image::guess_format(&data).map_err(|x| format!("{:?}", x))?;
     match format {
         ::image::ImageFormat::JPEG => {
             unsafe {
