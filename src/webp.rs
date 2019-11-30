@@ -14,7 +14,7 @@ use crate::ffi::{
 // DECODER UTILS
 ///////////////////////////////////////////////////////////////////////////////
 
-pub fn jpeg_to_webp(data: Vec<u8>) -> Result<WebPPicture, String> {
+pub fn load_jpeg(data: Vec<u8>) -> Result<WebPPicture, String> {
     let mut picture: WebPPicture = unsafe {
         std::mem::zeroed()
     };
@@ -70,5 +70,5 @@ pub fn run() {
     assert!(input_path.exists());
     let config = webp_config(75.0);
     let source = std::fs::read(input_path).expect("open image failed");
-    let picture = jpeg_to_webp(source);
+    let picture = load_jpeg(source);
 }
