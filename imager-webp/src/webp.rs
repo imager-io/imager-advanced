@@ -22,7 +22,7 @@ pub fn load_jpeg(data: Vec<u8>) -> Result<WebPPicture, String> {
     match format {
         ::image::ImageFormat::JPEG => {
             unsafe {
-                ffi::cbits::utils::webp_picture_from_jpeg(
+                ffi::cbits::webp::webp_picture_from_jpeg(
                     data.as_ptr(),
                     data.len() as libc::size_t,
                     &mut picture
@@ -31,7 +31,7 @@ pub fn load_jpeg(data: Vec<u8>) -> Result<WebPPicture, String> {
         }
         ::image::ImageFormat::PNG => {
             unsafe {
-                ffi::cbits::utils::webp_picture_from_png(
+                ffi::cbits::webp::webp_picture_from_png(
                     data.as_ptr(),
                     data.len() as libc::size_t,
                     &mut picture
@@ -51,8 +51,8 @@ pub fn webp_config(q: f32) -> WebPConfig {
         std::mem::zeroed()
     };
     unsafe {
-        ffi::cbits::encoder::webp_config_init(&mut config);
-        ffi::cbits::encoder::webp_validate_config(&mut config);
+        ffi::cbits::webp::webp_config_init(&mut config);
+        ffi::cbits::webp::webp_validate_config(&mut config);
     };
     config.quality = q;
     config.lossless = 0;

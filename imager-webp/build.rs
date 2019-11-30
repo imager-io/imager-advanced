@@ -327,9 +327,7 @@ fn build_dependencies() {
 pub fn compile_cbits() {
     cc::Build::new()
         .include("include")
-        .file("cbits/encoder.c")
-        .file("cbits/decoder.c")
-        .file("cbits/utils.c")
+        .file("cbits/webp.c")
         .compile("cbits");
 }
 

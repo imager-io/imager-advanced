@@ -13,4 +13,14 @@ extern {
         quality: c_float,
     );
     pub fn webp_validate_config(config: *mut ffi::webp::WebPConfig);
+    pub fn webp_picture_from_jpeg(
+        data: *const u8,
+        data_size: size_t,
+        picture: *mut ffi::WebPPicture,
+    );
+    pub fn webp_picture_from_png(
+        data: *const u8,
+        data_size: size_t,
+        picture: *mut ffi::WebPPicture,
+    );
 }
