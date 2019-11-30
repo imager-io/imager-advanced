@@ -10,21 +10,11 @@ use crate::ffi::{
 };
 
 
-pub fn encoder_config(q: f32) -> WebPConfig {
-    let mut config: WebPConfig = unsafe {
-        std::mem::zeroed()
-    };
-    unsafe {
-        ffi::cbits::encoder::webp_config_init(&mut config);
-        ffi::cbits::encoder::webp_validate_config(&mut config);
-    };
-    config.quality = q;
-    config.lossless = 0;
-    config.method = 6;
-    config
-}
+///////////////////////////////////////////////////////////////////////////////
+// DECODER UTILS
+///////////////////////////////////////////////////////////////////////////////
 
-pub fn load_image(data: Vec<u8>) -> Result<WebPPicture, String> {
+pub fn jpeg_to_webp(data: Vec<u8>) -> Result<WebPPicture, String> {
     let mut picture: WebPPicture = unsafe {
         std::mem::zeroed()
     };
@@ -56,14 +46,30 @@ pub fn load_image(data: Vec<u8>) -> Result<WebPPicture, String> {
     Ok(picture)
 }
 
-pub fn open_image<P: AsRef<Path>>(path: P) -> Result<WebPPicture, String> {
-    let data = std::fs::read(path).expect("open image failed");
-    load_image(data)
+
+pub fn webp_config(q: f32) -> WebPConfig {
+    let mut config: WebPConfig = unsafe {
+        std::mem::zeroed()
+    };
+    unsafe {
+        ffi::cbits::encoder::webp_config_init(&mut config);
+        ffi::cbits::encoder::webp_validate_config(&mut config);
+    };
+    config.quality = q;
+    config.lossless = 0;
+    config.method = 6;
+    config
 }
 
-pub fn main() {
-    let input_path = PathBuf::from("assets/samples/small/low/2yV-pyOxnPw300.jpeg");
+
+///////////////////////////////////////////////////////////////////////////////
+// DEV
+///////////////////////////////////////////////////////////////////////////////
+
+pub fn run() {
+    let input_path = PathBuf::from("assets/test/1.jpeg");
     assert!(input_path.exists());
-    let config = encoder_config(75.0);
-    let picture = open_image(&input_path).expect("open_image failed");
+    let config = webp_config(75.0);
+    let source = std::fs::read(input_path).expect("open image failed");
+    let picture = jpeg_to_webp(source);
 }
