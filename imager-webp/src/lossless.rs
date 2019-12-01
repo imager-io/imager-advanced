@@ -12,7 +12,7 @@ use webp_dev::sys::webp::{
 };
 
 
-fn webp_lossless_config() -> WebPConfig {
+pub fn init_config() -> WebPConfig {
     let mut config: WebPConfig = unsafe {std::mem::zeroed()};
     unsafe {
         webp_sys::webp_config_init(&mut config);
@@ -24,7 +24,7 @@ fn webp_lossless_config() -> WebPConfig {
     config
 }
 
-fn new_lossless_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMemoryWriter) {
+pub fn init_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMemoryWriter) {
     let (width, height) = source.dimensions();
     assert!(width < webp_sys::WEBP_MAX_DIMENSION);
     assert!(height < webp_sys::WEBP_MAX_DIMENSION);
@@ -82,9 +82,9 @@ fn new_lossless_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMemoryW
     (picture, writer)
 }
 
-fn encode_lossless(source: &DynamicImage) -> Vec<u8> {
-    let config = webp_lossless_config();
-    let (mut picture, writer_ptr) = new_lossless_picture(&source);
+pub fn encode(source: &DynamicImage) -> Vec<u8> {
+    let config = init_config();
+    let (mut picture, writer_ptr) = init_picture(&source);
     unsafe {
         assert!(webp_sys::webp_encode(&config, &mut picture) != 0);
     };
@@ -112,6 +112,6 @@ fn encode_lossless(source: &DynamicImage) -> Vec<u8> {
 pub fn run() {
     let input_path = "assets/samples/2yV-pyOxnPw300.jpeg";
     let source = ::image::open(input_path).expect("source image");
-    let output = encode_lossless(&source);
+    let output = encode(&source);
     std::fs::write("assets/output/test.webp", output);
 }
