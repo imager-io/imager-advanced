@@ -1,8 +1,7 @@
 #![allow(unused)]
-pub mod webp;
-pub mod ffi;
+pub mod lossless;
+pub mod lossy;
 
 fn main() {
-    // println!("Hello, world!");
-    webp::run();
+    lossless::run();
 }
