@@ -12,7 +12,7 @@ use webp_dev::sys::webp::{
 };
 
 
-pub fn webp_lossless_config() -> WebPConfig {
+fn webp_lossless_config() -> WebPConfig {
     let mut config: WebPConfig = unsafe {std::mem::zeroed()};
     unsafe {
         webp_sys::webp_config_init(&mut config);
@@ -24,7 +24,7 @@ pub fn webp_lossless_config() -> WebPConfig {
     config
 }
 
-pub fn new_lossless_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMemoryWriter) {
+fn new_lossless_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMemoryWriter) {
     let (width, height) = source.dimensions();
     assert!(width < webp_sys::WEBP_MAX_DIMENSION);
     assert!(height < webp_sys::WEBP_MAX_DIMENSION);
@@ -37,29 +37,25 @@ pub fn new_lossless_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMem
     picture.width = width as i32;
     picture.height = height as i32;
     picture.argb_stride = argb_stride as i32;
-    // FILL ARGB BUFFERS
+    // FILL PIXEL BUFFERS
     unsafe {
         let mut pixel_data = source
-            // .to_rgb()
+            .to_rgba()
             .pixels()
-            .flat_map(|(x, y, px)| {
-                let [r, g, b, _] = px.0;
-                [r, g, b].to_vec()
-            })
+            .flat_map(|px| px.0.to_vec())
             .collect::<Vec<_>>();
-        let full_stride = argb_stride * 3;
-        let status = webp_sys::webp_picture_import_rgb(
+        let full_stride = argb_stride * 4;
+        let status = webp_sys::webp_picture_import_rgba(
             &mut picture,
             pixel_data.as_mut_ptr(),
             full_stride as i32,
         );
         // CHECKS
-        let expected_size = argb_stride * height * 3;
+        let expected_size = argb_stride * height * 4;
         assert!(pixel_data.len() as u32 == expected_size);
         assert!(status != 0);
         // CLEANUP
-        std::mem::forget(pixel_data);
-        // std::mem::drop(pixel_data);
+        std::mem::drop(pixel_data);
     };
     // CHECKS
     assert!(picture.use_argb == 1);
@@ -86,7 +82,7 @@ pub fn new_lossless_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMem
     (picture, writer)
 }
 
-pub fn encode_lossless(source: &DynamicImage) -> Vec<u8> {
+fn encode_lossless(source: &DynamicImage) -> Vec<u8> {
     let config = webp_lossless_config();
     let (mut picture, writer_ptr) = new_lossless_picture(&source);
     unsafe {
@@ -94,17 +90,16 @@ pub fn encode_lossless(source: &DynamicImage) -> Vec<u8> {
     };
     // COPY OUTPUT
     let mut writer = unsafe { Box::from_raw(writer_ptr) };
-    // assert!(writer.size == writer.max_size);
     let mut output: Vec<u8> = unsafe {
         std::slice::from_raw_parts_mut(writer.mem, writer.size).to_vec()
     };
     // CLEANUP PICTURE & WRITER
     unsafe {
-        // webp_sys::webp_picture_free(&mut picture);
-        // webp_sys::webp_memory_writer_clear(writer_ptr);
-        // std::mem::drop(picture);
-        // std::mem::drop(writer_ptr);
-        // std::mem::drop(writer);
+        webp_sys::webp_picture_free(&mut picture);
+        webp_sys::webp_memory_writer_clear(writer_ptr);
+        std::mem::drop(picture);
+        std::mem::drop(writer_ptr);
+        std::mem::drop(writer);
     };
     // DONE
     output
@@ -115,8 +110,6 @@ pub fn encode_lossless(source: &DynamicImage) -> Vec<u8> {
 ///////////////////////////////////////////////////////////////////////////////
 
 pub fn run() {
-    // let input_path = "assets/test/1.jpeg";
-    // let input_path = "assets/samples/pexels-photo-3110502.jpeg";
     let input_path = "assets/samples/2yV-pyOxnPw300.jpeg";
     let source = ::image::open(input_path).expect("source image");
     let output = encode_lossless(&source);
