@@ -25,7 +25,7 @@ pub fn init_config(q: f32) -> WebPConfig {
 
 pub fn init_picture(source: &DynamicImage) -> (WebPPicture, *mut WebPMemoryWriter) {
     // SETUP
-    let (mut picture, writer) = crate::lossless::init_picture(source);
+    let (mut picture, writer) = crate::encode::lossless::init_picture(source);
     // CONVERT
     unsafe {
         assert!(webp_sys::webp_picture_sharp_argb_to_yuva(&mut picture) != 0);

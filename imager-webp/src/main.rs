@@ -1,8 +1,6 @@
 #![allow(unused)]
-pub mod lossless;
-pub mod lossy;
+pub mod encode;
 
 fn main() {
-    // lossless::run();
-    lossy::run();
+    encode::lossy::run();
 }
