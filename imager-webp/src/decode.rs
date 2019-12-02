@@ -39,9 +39,3 @@ pub fn decode(source: &Vec<u8>) -> DynamicImage {
     media
 }
 
-pub fn run() {
-    let input_path = "assets/output/test.webp";
-    let source = std::fs::read(input_path).expect("read source image");
-    let output = decode(&source);
-    output.save("assets/output/out.jpeg").expect("save as jpeg image");
-}

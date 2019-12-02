@@ -105,13 +105,3 @@ pub fn encode(source: &DynamicImage) -> Vec<u8> {
     output
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// DEV
-///////////////////////////////////////////////////////////////////////////////
-
-pub fn run() {
-    let input_path = "assets/samples/2yV-pyOxnPw300.jpeg";
-    let source = ::image::open(input_path).expect("source image");
-    let output = encode(&source);
-    std::fs::write("assets/output/test.webp", output);
-}
